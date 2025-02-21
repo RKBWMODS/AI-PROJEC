@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DIZ FLYZE AI - Tampilan Modern</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928dab);
+      color: #fff;
+      overflow: hidden;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+    
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 60px;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #0ff;
+    }
+    #hamburgerBtn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 25px;
+    }
+    #hamburgerBtn span {
+      display: block;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: background 0.3s;
+    }
+    
+    #mobileMenu {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 1500;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+    }
+    #mobileMenu ul {
+      list-style: none;
+      text-align: center;
+    }
+    #mobileMenu li {
+      margin: 15px 0;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    #mobileMenu li:hover { color: #0ff; }
+    #mobileMenu .menu-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 30px;
+      color: #0ff;
+    }
+    #mobileMenu .close-menu {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    .chat-area {
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .chat-window {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      backdrop-filter: blur(5px);
+      height: calc(100% - 80px);
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .chat-message { margin-bottom: 15px; }
+    .chat-message.user { text-align: right; }
+    .chat-message.ai { text-align: left; }
+    .message-content {
+      display: inline-block;
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 70%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .chat-message.user .message-content {
+      background: #0ff;
+      color: #000;
+      border-bottom-right-radius: 0;
+    }
+    .chat-message.ai .message-content {
+      background: #ff0;
+      color: #000;
+      border-bottom-left-radius: 0;
+    }
+    .timestamp {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+    
+    .input-area {
+      display: flex;
+      align-items: center;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 25px;
+      outline: none;
+      font-size: 1rem;
+    }
+    .input-area button {
+      margin-left: 10px;
+      padding: 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    .input-area button img {
+      width: 37px;
+      height: 37px;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal .modal-content {
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+    }
+    .modal .close-modal {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    @media (max-width: 768px) { }
+  </style>
+</head>
+<body>
+  <header>
+    <button id="hamburgerBtn" aria-label="Buka menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="logo">DIZ FLYZE AI</div>
+  </header>
+  
+  <div id="mobileMenu" aria-modal="true" role="dialog">
+    <button class="close-menu" id="closeMobileMenu" aria-label="Tutup menu">&times;</button>
+    <div class="menu-title">DIZ FLYZE AI</div>
+    <ul>
+      <li id="menuPengaturan">Pengaturan</li>
+      <li id="menuMusik">Musik</li>
+      <li id="menuInfo">Info</li>
+      <li id="menuUbahTema">Ubah Tema</li>
+      <li id="menuHistoriChat">Histori Chat</li>
+      <li id="menuHapusHistori">Hapus Histori</li>
+    </ul>
+  </div>
+  
+  <div class="chat-area">
+    <div class="chat-window" id="chatWindow">
+    </div>
+    <div class="input-area">
+      <input type="text" id="chatInput" placeholder="Ketik pesan ke AI..." aria-label="Input pesan">
+      <button id="sendChat" aria-label="Kirim pesan">
+        <img src="https://i.ibb.co.com/z9vZkcF/1a895756bdb0.png" alt="Kirim Pesan">
+      </button>
+    </div>
+  </div>
+  
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-modal" id="closeSettingsModal" aria-label="Tutup pengaturan">&times;</button>
+      <h2>Pengaturan</h2>
+      <form id="settingsForm">
+        <label for="selectTheme">Pilih Tema:</label>
+        <select id="selectTheme" name="theme">
+          <option value="dark">Gelap</option>
+          <option value="light">Terang</option>
+        </select>
+        <br /><br />
+        <label for="selectLanguage">Pilih Bahasa:</label>
+        <select id="selectLanguage" name="language">
+          <option value="id">Bahasa Indonesia</option>
+          <option value="en">English</option>
+        </select>
+        <br /><br />
+        <button type="submit">Simpan Pengaturan</button>
+      </form>
+    </div>
+  </div>
+  
+  <div class="modal" id="musicModal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-modal" id="closeMusicModal" aria-label="Tutup musik">&times;</button>
+      <h2>Musik</h2>
+      <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;">
+        <iframe id="musicFrame" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen 
+          style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="infoModal" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button class="close-modal" id="closeInfoModal" aria-label="Tutup info">&times;</button>
+      <h2>Informasi</h2>
+      <p>DIZ FLYZE AI v1.0<br>Dibuat dengan teknologi modern untuk pengalaman AI futuristik.</p>
+    </div>
+  </div>
+  
+  <script>
+    // Fungsi format waktu
+    function getFormattedTime() {
+      return new Date().toLocaleTimeString();
+    }
+    
+    // Tambah pesan ke chat window dan simpan histori ke localStorage
+    const chatWindow = document.getElementById('chatWindow');
+    const chatInput = document.getElementById('chatInput');
+    const sendChat = document.getElementById('sendChat');
+    
+    function addMessage(sender, text) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('chat-message', sender);
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.classList.add('message-content');
+      contentDiv.textContent = text;
+      messageDiv.appendChild(contentDiv);
+      
+      const timeDiv = document.createElement('div');
+      timeDiv.classList.add('timestamp');
+      timeDiv.textContent = getFormattedTime();
+      messageDiv.appendChild(timeDiv);
+      
+      chatWindow.appendChild(messageDiv);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      localStorage.setItem('chatHistory', chatWindow.innerHTML);
+    }
+    
+    sendChat.addEventListener('click', () => {
+      const message = chatInput.value.trim();
+      if (message) {
+        addMessage('user', message);
+        chatInput.value = '';
+        fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message })
+        })
+          .then(response => response.json())
+          .then(data => {
+            addMessage('ai', "⍚ DIZ AI RESPON ⍚\n" + data.response);
+          })
+          .catch(error => {
+            console.error(error);
+            addMessage('ai', "Error: " + error.message);
+          });
+      }
+    });
+    
+    chatInput.addEventListener('keyup', (event) => {
+      if (event.key === 'Enter') sendChat.click();
+    });
+    
+    window.addEventListener('load', () => {
+      const savedHistory = localStorage.getItem('chatHistory');
+      if (savedHistory) { chatWindow.innerHTML = savedHistory; }
+    });
+    
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const closeMobileMenu = document.getElementById('closeMobileMenu');
+    
+    hamburgerBtn.addEventListener('click', () => {
+      mobileMenu.style.display = 'flex';
+    });
+    closeMobileMenu.addEventListener('click', () => {
+      mobileMenu.style.display = 'none';
+    });
+    
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsModal = document.getElementById('closeSettingsModal');
+    closeSettingsModal.addEventListener('click', () => {
+      settingsModal.style.display = 'none';
+    });
+    document.getElementById('settingsForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const theme = document.getElementById('selectTheme').value;
+      localStorage.setItem('theme', theme);
+      if(theme === 'light'){
+        document.body.style.background = "#f5f5f5";
+        document.body.style.color = "#333";
+      } else {
+        document.body.style.background = "linear-gradient(135deg, #1f1c2c, #928dab)";
+        document.body.style.color = "#fff";
+      }
+      settingsModal.style.display = 'none';
+      mobileMenu.style.display = 'none';
+    });
+    
+    const musicModal = document.getElementById('musicModal');
+    const closeMusicModal = document.getElementById('closeMusicModal');
+    closeMusicModal.addEventListener('click', () => {
+      musicModal.style.display = 'none';
+      document.getElementById('musicFrame').src = "";
+    });
+    
+    const infoModal = document.getElementById('infoModal');
+    const closeInfoModal = document.getElementById('closeInfoModal');
+    closeInfoModal.addEventListener('click', () => {
+      infoModal.style.display = 'none';
+    });
+    
+    document.getElementById('menuPengaturan').addEventListener('click', () => {
+      settingsModal.style.display = 'flex';
+      mobileMenu.style.display = 'none';
+    });
+    document.getElementById('menuMusik').addEventListener('click', () => {
+      musicModal.style.display = 'flex';
+      document.getElementById('musicFrame').src = "https://www.youtube.com/embed/TicGJQqrq2M";
+      mobileMenu.style.display = 'none';
+    });
+    document.getElementById('menuInfo').addEventListener('click', () => {
+      infoModal.style.display = 'flex';
+      mobileMenu.style.display = 'none';
+    });
+    document.getElementById('menuUbahTema').addEventListener('click', () => {
+      const currentTheme = localStorage.getItem('theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      if(newTheme === 'light'){
+        document.body.style.background = "#f5f5f5";
+        document.body.style.color = "#333";
+      } else {
+        document.body.style.background = "linear-gradient(135deg, #1f1c2c, #928dab)";
+        document.body.style.color = "#fff";
+      }
+      mobileMenu.style.display = 'none';
+    });
+    document.getElementById('menuHistoriChat').addEventListener('click', () => {
+      alert("Histori Chat telah dimuat dari penyimpanan lokal.");
+      mobileMenu.style.display = 'none';
+    });
+    document.getElementById('menuHapusHistori').addEventListener('click', () => {
+      chatWindow.innerHTML = "";
+      localStorage.removeItem('chatHistory');
+      mobileMenu.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
